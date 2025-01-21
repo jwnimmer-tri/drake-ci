@@ -274,15 +274,8 @@ if(NOT PROVISION)
     fatal("bazel was not found")
   endif()
 
-  if(DASHBOARD_UNIX_DISTRIBUTION STREQUAL "Apple")
-    set(USER_ENVIRONMENT_PROVISION_DIR "mac")
-  else()
-    string(TOLOWER "${DASHBOARD_UNIX_DISTRIBUTION}" USER_ENVIRONMENT_PROVISION_DIR)
-  endif()
-  set(USER_ENVIRONMENT_PROVISION_SCRIPT
-    "${DASHBOARD_SOURCE_DIRECTORY}/setup/${USER_ENVIRONMENT_PROVISION_DIR}/source_distribution/install_prereqs_user_environment.sh")
   message(STATUS "Executing user environment provisioning script...")
-  execute_process(COMMAND bash "-c" "${USER_ENVIRONMENT_PROVISION_SCRIPT}"
+  execute_process(COMMAND "${DASHBOARD_SOURCE_DIRECTORY}/setup/install_prereqs --dotfile"
     RESULT_VARIABLE INSTALL_PREREQS_USER_ENVIRONMENT_RESULT_VARIABLE)
   if(NOT INSTALL_PREREQS_USER_ENVIRONMENT_RESULT_VARIABLE EQUAL 0)
     fatal("user environment provisioning script did not complete successfully")

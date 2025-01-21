@@ -39,7 +39,7 @@ WORKSPACE=setup ./drake-ci/setup/mac/install_prereqs
 
 
 git clone --depth 1 https://github.com/RobotLocomotion/drake.git
-./drake/setup/mac/install_prereqs.sh
+./drake/setup/install_prereqs --developer
 
 
 brew cleanup --prune=all

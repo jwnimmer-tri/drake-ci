@@ -71,9 +71,6 @@ endif()
 # Execute provisioning script, if requested
 if(PROVISION)
   if(DASHBOARD_UNIX_DISTRIBUTION STREQUAL "Apple")
-    set(PROVISION_DIR "mac")
-    set(PROVISION_SUDO)
-
     message(STATUS "Updating and upgrading Homebrew...")
     set(ENV{HOMEBREW_CURL_RETRIES} 4)
     execute_process(COMMAND "${DASHBOARD_BREW_COMMAND}" "update" "--force")
@@ -85,9 +82,6 @@ if(PROVISION)
 
     message(STATUS "Removing pip cache directory...")
     file(REMOVE_RECURSE "$ENV{HOME}/Library/Caches/pip")
-  else()
-    string(TOLOWER "${DASHBOARD_UNIX_DISTRIBUTION}" PROVISION_DIR)
-    set(PROVISION_SUDO "sudo")
   endif()
 
   if(GENERATOR STREQUAL "cmake")
@@ -106,18 +100,13 @@ if(PROVISION)
     set(PROVISION_ARGS)
   endif()
 
+  message(STATUS "Executing provisioning script...")
   set(PROVISION_SCRIPT
-    "${DASHBOARD_SOURCE_DIRECTORY}/setup/${PROVISION_DIR}/install_prereqs.sh")
-
-  if(EXISTS "${PROVISION_SCRIPT}")
-    message(STATUS "Executing provisioning script...")
-    execute_process(COMMAND bash "-c" "yes | ${PROVISION_SUDO} ${PROVISION_SCRIPT} ${PROVISION_ARGS}"
-      RESULT_VARIABLE INSTALL_PREREQS_RESULT_VARIABLE)
-    if(NOT INSTALL_PREREQS_RESULT_VARIABLE EQUAL 0)
-      fatal("provisioning script did not complete successfully")
-    endif()
-  else()
-    fatal("provisioning script not available for this platform")
+    "${DASHBOARD_SOURCE_DIRECTORY}/setup/install_prereqs.sh")
+  execute_process(COMMAND "${PROVISION_SCRIPT} ${PROVISION_ARGS}"
+    RESULT_VARIABLE INSTALL_PREREQS_RESULT_VARIABLE)
+  if(NOT INSTALL_PREREQS_RESULT_VARIABLE EQUAL 0)
+    fatal("provisioning script did not complete successfully")
   endif()
 
   find_program(DASHBOARD_BAZEL_COMMAND NAMES "bazel")
